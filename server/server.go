@@ -27,7 +27,8 @@ type server struct {
 
 func NewServer(name string) *server {
 	return &server{
-		agent: proto.NewAgent(name),
+		agent:  proto.NewAgent(name),
+		others: make(map[proto.AgentID]*agentInfo),
 	}
 }
 
