@@ -12,7 +12,9 @@ type AgentID uint32
 type L2ChanLayer struct {
 	AgentID   AgentID
 	Operation L2Operation
+	DataLen   uint8
 	Data      string
+	Payload   []byte
 }
 
 func (l *L2ChanLayer) LayerType() gopacket.LayerType {
@@ -24,7 +26,7 @@ func (l *L2ChanLayer) LayerContents() []byte {
 }
 
 func (l *L2ChanLayer) LayerPayload() []byte {
-	return nil
+	return l.Payload
 }
 
 var L2ChanLayerType = gopacket.RegisterLayerType(1000, gopacket.LayerTypeMetadata{

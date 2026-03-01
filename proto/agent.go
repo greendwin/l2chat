@@ -3,6 +3,7 @@ package proto
 import (
 	"crypto/rand"
 	"encoding/binary"
+	"log"
 )
 
 type Agent struct {
@@ -15,6 +16,9 @@ func NewAgent(name string) Agent {
 
 	// generate unique agentId for this session
 	binary.Read(rand.Reader, binary.NativeEndian, &r.Id)
+
+	log.Printf("AgentName = %q", r.Name)
+	log.Printf("AgentID = 0x%08x", r.Id)
 
 	return r
 }
