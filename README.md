@@ -6,14 +6,17 @@ Experimental chat based on low-level packets bypassing IP stack.
 
 ## Plan
 
-- Simple test
+- Simple test:
   - [x] start server on selected device (TBD: all devices?)
   - [x] send HELLO message to the networks
-  - [ ] process HELLO message from other apps (TBD: need UID for each instance)
-  - [ ] use BPF `ether proto 0xABC`
-- Track other instances presence (by periodic HELLO messages)
+  - [x] process HELLO message from other apps (TBD: need UID for each instance)
+  - [x] use BPF `ether proto 0xABC`
+  - [ ] rework `PacketSource` to `ReadPacketData` and `NewDecodingLayerParser`
+- Track other instances presence (by periodic HELLO messages):
+  - [x] process HELLO and BYE
+  - [ ] make user OFFLINE after timeout
 - Encrypt messages (TBD: clients must share the same keys)
-- Store chat history in Redis
+- TBD: Store chat history in Redis
 - Host simple web server for chat access
 - Support `bridge` mode to transfer packets using UDP stack
 
