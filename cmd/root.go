@@ -10,7 +10,7 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "l2chat",
 	Short: "Layer 2 Chat",
-	Long:  `Host a Layer2 Chat server that bypasses IP stack and work on top of raw ethernet packets.`,
+	Long:  "Host a Layer2 Chat server that bypasses IP stack and work on top of raw ethernet packets.",
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
