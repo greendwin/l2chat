@@ -4,6 +4,19 @@ L2 Chat
 Experimental chat based on low-level packets bypassing IP stack.
 
 
+## Plan
+
+- Simple test
+  - [ ] start server on selected device (TBD: all devices?)
+  - [ ] send HELLO message to the networks
+  - [ ] process HELLO message from other apps (TBD: need UID for each instance)
+- Track other instances presence (by periodic HELLO messages)
+- Encrypt messages (TBD: clients must share the same keys)
+- Store chat history in Redis
+- Host simple web server for chat access
+- Support `bridge` mode to transfer packets using UDP stack
+
+
 ## Dependencies
 
 ### gopacket
