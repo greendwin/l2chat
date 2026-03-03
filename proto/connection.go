@@ -60,6 +60,11 @@ func FindDeviceHWAddr(deviceName string) (net.HardwareAddr, bool, error) {
 	}
 
 	for _, netIfs := range netIfaces {
+		if len(netIfs.HardwareAddr) == 0 {
+			// skip broken hardware addresses like in `127.0.0.1`
+			continue
+		}
+
 		netAddrs, err := netIfs.Addrs()
 		if err != nil {
 			return nil, false, err

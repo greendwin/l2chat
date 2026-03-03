@@ -7,24 +7,36 @@ import (
 	"github.com/greendwin/l2chat/proto"
 )
 
-func ListDevices() error {
+func ListDevices(showAllDevices bool) error {
 	ifaces, err := pcap.FindAllDevs()
 	if err != nil {
 		return err
 	}
 
-	for k, ifs := range ifaces {
-		if k > 0 {
-			fmt.Printf("\n")
-		}
-		fmt.Printf("Name:\t%s\nID:\t%s\n", ifs.Description, ifs.Name)
+	first := true
 
+	for _, ifs := range ifaces {
 		hwaddr, ok, err := proto.FindDeviceHWAddr(ifs.Name)
 		if err != nil {
 			return err
 		}
-		if ok {
+		if !ok && !showAllDevices {
+			// skip devices without MAC
+			continue
+		}
+
+		if !first {
+			fmt.Printf("\n")
+		}
+		first = false
+
+		fmt.Printf("Name:\t%s\n", ifs.Description)
+		fmt.Printf("ID:\t%s\n", ifs.Name)
+
+		if len(hwaddr) > 0 {
 			fmt.Printf("MAC:\t%s\n", hwaddr.String())
+		} else {
+			fmt.Printf("MAC:\t<MISSING>\n")
 		}
 
 		if len(ifs.Addresses) > 0 {
