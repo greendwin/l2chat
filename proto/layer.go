@@ -18,7 +18,7 @@ type L2ChanLayer struct {
 }
 
 func (l *L2ChanLayer) LayerType() gopacket.LayerType {
-	return L2ChanLayerType
+	return LayerTypeL2Chan
 }
 
 func (l *L2ChanLayer) LayerContents() []byte {
@@ -29,7 +29,7 @@ func (l *L2ChanLayer) LayerPayload() []byte {
 	return l.Payload
 }
 
-var L2ChanLayerType = gopacket.RegisterLayerType(1000, gopacket.LayerTypeMetadata{
+var LayerTypeL2Chan = gopacket.RegisterLayerType(1000, gopacket.LayerTypeMetadata{
 	Name:    "L2ChanLayer",
 	Decoder: gopacket.DecodeFunc(decodeL2ChanLayer),
 })
@@ -37,7 +37,19 @@ var L2ChanLayerType = gopacket.RegisterLayerType(1000, gopacket.LayerTypeMetadat
 func init() {
 	layers.EthernetTypeMetadata[EthernetTypeL2Chan] = layers.EnumMetadata{
 		Name:       "L2ChanLayer",
-		LayerType:  L2ChanLayerType,
+		LayerType:  LayerTypeL2Chan,
 		DecodeWith: gopacket.DecodeFunc(decodeL2ChanLayer),
 	}
+}
+
+func decodeL2ChanLayer(data []byte, pb gopacket.PacketBuilder) error {
+	l := L2ChanLayer{}
+	err := l.DecodeFromBytes(data, pb)
+	if err != nil {
+		return err
+	}
+
+	pb.AddLayer(&l)
+
+	return pb.NextDecoder(gopacket.DecodePayload)
 }

@@ -62,7 +62,7 @@ func (s *server) serveDevice(ctx context.Context, agent *proto.Agent, deviceName
 	// try send goodbye on exit
 	defer conn.SendBye()
 
-	ch, err := conn.Listen()
+	ch, err := conn.Listen(ctx)
 	if err != nil {
 		return err
 	}

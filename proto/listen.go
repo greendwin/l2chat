@@ -1,45 +1,59 @@
 package proto
 
 import (
+	"context"
 	"fmt"
+	"time"
 
 	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
 )
 
-func (c *Connection) Listen() (<-chan *L2ChanLayer, error) {
+func (c *Connection) Listen(ctx context.Context) (<-chan *L2ChanLayer, error) {
 	err := c.handle.SetBPFFilter(fmt.Sprintf("ether proto %v", EthernetTypeL2Chan))
 	if err != nil {
 		return nil, fmt.Errorf("failed to set BPF filter: %w", err)
 	}
 
-	src := gopacket.NewPacketSource(c.handle, c.handle.LinkType())
-	src.DecodeOptions.NoCopy = true
-	src.DecodeOptions.Lazy = true
-
 	output := make(chan *L2ChanLayer, 100)
-	input := src.Packets()
 
 	go func() {
 		defer close(output)
 
-		for packet := range input {
-			processPacket(packet, output)
+		var eth layers.Ethernet
+		var l2chan L2ChanLayer
+		parser := gopacket.NewDecodingLayerParser(layers.LayerTypeEthernet, &eth, &l2chan)
+		decoded := make([]gopacket.LayerType, 0, 4)
+
+		for {
+			// check whether context was cancelled
+			select {
+			case <-ctx.Done():
+				return
+			default:
+			}
+
+			data, _, err := c.handle.ReadPacketData()
+			if err != nil {
+				// wait some time and repeat
+				time.Sleep(10 * time.Millisecond)
+				continue
+			}
+
+			err = parser.DecodeLayers(data, &decoded)
+			if err != nil {
+				// skip broken packet
+				continue
+			}
+
+			for _, lt := range decoded {
+				if lt == LayerTypeL2Chan {
+					r := l2chan
+					output <- &r
+				}
+			}
 		}
 	}()
 
 	return output, nil
-}
-
-func processPacket(p gopacket.Packet, output chan *L2ChanLayer) {
-	l := p.Layer(L2ChanLayerType)
-	if l == nil {
-		return
-	}
-
-	layer, ok := l.(*L2ChanLayer)
-	if !ok {
-		panic("failed to cast `L2ChanLayer`")
-	}
-
-	output <- layer
 }

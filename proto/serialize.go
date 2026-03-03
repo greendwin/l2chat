@@ -12,24 +12,27 @@ var errorTooShort = errors.New("packet data is too short")
 
 const headerSize = 4 + 1 + 1 // AgentID + Operation + DataLen
 
-func decodeL2ChanLayer(data []byte, pb gopacket.PacketBuilder) error {
+func (l *L2ChanLayer) CanDecode() gopacket.LayerClass {
+	return LayerTypeL2Chan
+}
+
+func (l *L2ChanLayer) NextLayerType() gopacket.LayerType {
+	return gopacket.LayerTypePayload
+}
+
+func (l *L2ChanLayer) DecodeFromBytes(data []byte, df gopacket.DecodeFeedback) error {
 	if len(data) < headerSize {
+		df.SetTruncated()
 		return errorTooShort
 	}
 
-	id := AgentID(binary.BigEndian.Uint32(data[:4]))
-	op := L2Operation(data[4])
-	dataLen := data[5]
+	l.AgentID = AgentID(binary.BigEndian.Uint32(data[:4]))
+	l.Operation = L2Operation(data[4])
+	l.DataLen = data[5]
+	l.Data = string(data[headerSize : headerSize+l.DataLen])
+	l.Payload = data[headerSize+l.DataLen:]
 
-	pb.AddLayer(&L2ChanLayer{
-		AgentID:   id,
-		Operation: op,
-		DataLen:   dataLen,
-		Data:      string(data[headerSize : headerSize+dataLen]),
-		Payload:   data[headerSize+dataLen:],
-	})
-
-	return pb.NextDecoder(gopacket.DecodePayload)
+	return nil
 }
 
 func (l *L2ChanLayer) SerializeTo(b gopacket.SerializeBuffer, opts gopacket.SerializeOptions) error {
@@ -46,3 +49,5 @@ func (l *L2ChanLayer) SerializeTo(b gopacket.SerializeBuffer, opts gopacket.Seri
 
 	return nil
 }
+
+var _ gopacket.DecodingLayer = (*L2ChanLayer)(nil)
