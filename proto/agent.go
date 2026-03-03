@@ -6,8 +6,8 @@ import (
 )
 
 type Agent struct {
-	Id   uint32
 	Name string
+	Id   AgentID
 }
 
 func NewAgent(name string) Agent {

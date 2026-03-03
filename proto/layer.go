@@ -7,9 +7,11 @@ import (
 
 const EthernetTypeL2Chan = 7890
 
+type AgentID uint32
+
 type L2ChanLayer struct {
-	AgentID   uint32
-	Operation uint8
+	AgentID   AgentID
+	Operation L2Operation
 	Data      string
 }
 

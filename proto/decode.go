@@ -18,8 +18,8 @@ func decodeL2ChanLayer(data []byte, pb gopacket.PacketBuilder) error {
 	}
 
 	l := L2ChanLayer{
-		AgentID:   binary.BigEndian.Uint32(data[:4]),
-		Operation: data[4],
+		AgentID:   AgentID(binary.BigEndian.Uint32(data[:4])),
+		Operation: L2Operation(data[4]),
 		Data:      string(data[headerSize:]),
 	}
 
@@ -34,8 +34,8 @@ func (l *L2ChanLayer) SerializeTo(b gopacket.SerializeBuffer, opts gopacket.Seri
 		return fmt.Errorf("L2ChanLayer.SerializeTo: %w", err)
 	}
 
-	binary.BigEndian.PutUint32(contents[:4], l.AgentID)
-	contents[4] = l.Operation
+	binary.BigEndian.PutUint32(contents[:4], uint32(l.AgentID))
+	contents[4] = uint8(l.Operation)
 	copy(contents[headerSize:], []byte(l.Data))
 
 	return nil
