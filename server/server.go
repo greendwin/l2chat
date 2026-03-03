@@ -123,9 +123,15 @@ func (s *server) processMessage(msg *proto.L2ChanLayer) error {
 		}
 
 	case proto.OpEcho:
+		panic("not implemented")
 	case proto.OpEchoReply:
+		panic("not implemented")
 	case proto.OpMessage:
+		panic("not implemented")
+
+	default:
+		log.Printf("WARN: received unknown operation %v from 0x%08x", msg.Operation, msg.AgentID)
 	}
 
-	panic("not implemented")
+	return nil
 }
