@@ -1,0 +1,7 @@
+services:
+  l2chat:
+    build:
+      context: .
+    container_name: l2chat-app
+    network_mode: host
+    command: ["run", "${NAME}", "--device", "${DEVICE}"]

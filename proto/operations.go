@@ -9,6 +9,8 @@ import (
 	"github.com/google/gopacket/layers"
 )
 
+type L2Operation uint8
+
 const (
 	OpHello = iota // payload: username
 	OpBye
@@ -16,6 +18,23 @@ const (
 	OpEchoReply // payload: data from Echo
 	OpMessage   // payload: text
 )
+
+func (op L2Operation) String() string {
+	switch op {
+	case OpHello:
+		return "HELLO"
+	case OpBye:
+		return "BYE"
+	case OpEcho:
+		return "ECHO"
+	case OpEchoReply:
+		return "ECHO_REPLY"
+	case OpMessage:
+		return "MESSAGE"
+	default:
+		panic(fmt.Sprintf("unknown operation: %d", uint8(op)))
+	}
+}
 
 var broadcastHWAddr = net.HardwareAddr{0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 
@@ -41,7 +60,7 @@ func (c *Connection) SendBye() error {
 	return nil
 }
 
-func (c *Connection) sendPacket(op uint8, data string) error {
+func (c *Connection) sendPacket(op L2Operation, data string) error {
 	ether := layers.Ethernet{
 		SrcMAC:       c.hwaddr,
 		DstMAC:       broadcastHWAddr,
